@@ -18,8 +18,9 @@ const (
 )
 
 var (
-	metricsPath = flag.String("metrics_path", "/sys/class/power_supply/BAT0", "metrics path, usually it will be `/sys/class/power_supply/BAT0` or `/sys/class/power_supply/BAT1`")
-	listenAt    = flag.String("listen_at", "0.0.0.0:9119", "web server listen address")
+	metricsPath    = flag.String("metrics_path", "/sys/class/power_supply/BAT0", "metrics path, usually it will be `/sys/class/power_supply/BAT0` or `/sys/class/power_supply/BAT1`")
+	listenAt       = flag.String("listen_at", "0.0.0.0:9119", "web server listen address")
+	cycleCountPath = flag.String("model", "/sys/class/power_supply/BAT0", "cycle count path, such as `/sys/class/power_supply/BAT0`, or `/sys/devices/platform/smapi/BAT0` for thinkpad")
 
 	energyNow = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: "battery_energy_now",
@@ -41,7 +42,6 @@ var (
 		"energy_now":         energyNow,
 		"energy_full":        energyFull,
 		"energy_full_design": energyFullDesign,
-		"cycle_count":        cycleCount,
 	}
 )
 
@@ -53,23 +53,41 @@ func init() {
 	prometheus.MustRegister(cycleCount)
 }
 
+func readValue(path string) (float64, error) {
+	m, err := ioutil.ReadFile(path)
+	if err != nil {
+		return 0, err
+	}
+
+	value, err := strconv.ParseFloat(strings.TrimRight(string(m), "\n"), 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return value, nil
+}
+
 func collectMetrics() {
 	for k, v := range MetricsMap {
 		metricFilePath := filepath.Join(*metricsPath, k)
-		m, err := ioutil.ReadFile(metricFilePath)
+
+		value, err := readValue(metricFilePath)
 		if err != nil {
 			log.Printf("failed to collect metric %s: %s", k, err)
 			continue
 		}
 
-		value, err := strconv.ParseFloat(strings.TrimRight(string(m), "\n"), 64)
-		if err != nil {
-			log.Printf("failed to parse value of metric %s: %s", k, err)
-			continue
-		}
-
 		v.Set(value)
 	}
+
+	// read cycle count, because ThinkPad needs special treat
+	cycleCountFilePath := filepath.Join(*cycleCountPath, "cycle_count")
+	value, err := readValue(cycleCountFilePath)
+	if err != nil {
+		log.Printf("failed to collect metric %s: %s", "cycle_count", err)
+		return
+	}
+	cycleCount.Set(value)
 }
 
 func main() {
