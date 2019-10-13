@@ -20,7 +20,7 @@ const (
 var (
 	metricsPath    = flag.String("metrics_path", "/sys/class/power_supply/BAT0", "metrics path, usually it will be `/sys/class/power_supply/BAT0` or `/sys/class/power_supply/BAT1`")
 	listenAt       = flag.String("listen_at", "0.0.0.0:9119", "web server listen address")
-	cycleCountPath = flag.String("model", "/sys/class/power_supply/BAT0", "cycle count path, such as `/sys/class/power_supply/BAT0`, or `/sys/devices/platform/smapi/BAT0` for thinkpad")
+	cycleCountPath = flag.String("cycle_count_path", "/sys/class/power_supply/BAT0", "cycle count path, such as `/sys/class/power_supply/BAT0`, or `/sys/devices/platform/smapi/BAT0` for thinkpad")
 
 	energyNow = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: "battery_energy_now",
