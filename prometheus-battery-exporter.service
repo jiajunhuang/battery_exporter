@@ -1,0 +1,9 @@
+[Unit]
+Description=Battery Prometheus Exporter
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/battery_exporter
+
+[Install]
+WantedBy=multi-user.target
