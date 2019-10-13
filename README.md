@@ -31,3 +31,11 @@ battery_energy_now 4.3806e+07
 - change the owner and permission: `sudo chown nobody:nobody /usr/local/bin/battery_exporter && sudo chmod +x /usr/local/bin/battery_exporter`
 - copy the systemd service file to `/etc/systemd/system/prometheus-battery-exporter.service`
 - start and enable it `sudo systemctl start prometheus-battery-exporter.service && sudo systemctl enable prometheus-battery-exporter.service`
+
+Grafana Dashboard is [Here](./grafana.json):
+
+![Grafana Dashboard For Battery Exporter](./battery_exporter_grafana.png)
+
+**Help wanted:**
+
+- I've tried but it not works: add variable for instance, so I can view one instance per time.
