@@ -35,7 +35,3 @@ battery_energy_now 4.3806e+07
 Grafana Dashboard is [Here](./grafana.json):
 
 ![Grafana Dashboard For Battery Exporter](./battery_exporter_grafana.png)
-
-**Help wanted:**
-
-- I've tried but it not works: add variable for instance, so I can view one instance per time.
